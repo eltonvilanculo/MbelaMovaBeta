@@ -37,7 +37,7 @@
     <string name="sign_out">Sign Out</string>
     <string name="verify_email">Verify Email</string>
     <string name="disconnect">Disconnect</string>
-    <string name="loading">Espere</string>
+    <string name="loading">Por favor , aguarde ...</string>
     <string name="custom_token">Custom Token</string>
     <string name="signed_in">Signed In</string>
     <string name="signed_out">Signed Out</string>

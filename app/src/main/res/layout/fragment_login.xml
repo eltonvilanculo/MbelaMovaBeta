@@ -113,6 +113,7 @@
                     android:maxLength="9"
                     android:lines="1"
                     android:maxLines="1"
+                    android:textColor="#fff"
 
                     android:inputType="phone"
                     android:textSize="30sp" />

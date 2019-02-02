@@ -180,7 +180,7 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onStart() {
         super.onStart();
-        if (acct != null) {
+    if (acct != null) {
 
             String personName = acct.getDisplayName();
             String personEmail = acct.getEmail();
@@ -215,15 +215,13 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(MapsActivity.this);
         signIn();
-
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         nav_profile_name = headerView.findViewById(R.id.nome_textView);
         mPerfilFoto = headerView.findViewById(R.id.perfil_foto);
+
 
 
         navigation_menu = (ImageView) findViewById(R.id.navigation_menu);
