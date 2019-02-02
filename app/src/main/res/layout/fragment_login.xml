@@ -1,0 +1,151 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/mbelaback"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    tools:context="mmconsultoria.co.mz.mbelamova.fragment.LoginFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/background_login"
+
+        >
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="15dp"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="170dp"
+                android:src="@drawable/boy"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="30dp"
+            >
+
+            <TextView
+                android:id="@+id/can_verify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Verificação de contacto "
+                android:textColor="#fff"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textColor="#fff"
+                android:text="@string/contactoText"
+                android:textSize="20dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+
+            android:layout_gravity="center"
+            android:gravity="center">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="18dp"
+                >
+
+                <TextView
+                    android:id="@+id/code_country"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:text="+258"
+                    android:textColor="#fff"
+                    android:textSize="30sp" />
+                <ImageView
+
+                    android:layout_width="20dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/rectangulo"
+                    />
+
+                <EditText
+                    android:id="@+id/login_fragment_phone_number_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:hint="84 1234567"
+                    android:textColorHint="#fff"
+                    android:maxLength="9"
+                    android:lines="1"
+                    android:maxLines="1"
+
+                    android:inputType="phone"
+                    android:textSize="30sp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="center"
+                android:background="#e0e0e0"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp">
+
+            </View>
+
+        </LinearLayout>
+
+
+        <ImageButton
+            android:id="@+id/login_fragment_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="18dp"
+            android:layout_marginRight="18dp"
+            android:layout_marginTop="48dp"
+            android:background="@drawable/botao_circular"
+            android:src="@drawable/ic_arrow_forward"
+            android:text="Button"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
