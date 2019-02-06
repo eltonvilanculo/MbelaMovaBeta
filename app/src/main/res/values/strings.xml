@@ -148,5 +148,7 @@ Maecenas lorem tortor, pharetra sed convallis ut, malesuada et risus. Maecenas c
     <string name="change_name_text">Trocar Nome</string>
     <string name="email_text">email</string>
     <string name="Destiny">Destino</string>
+    <string name="location_dialog_msg">Verifique os serviços de localização</string>
+    <string name="location_settings">habilitar localização</string>
     <!--AIzaSyAjcAUtwm3uHeHibHTo-PWKF3j7cijhjTA-->
 </resources>

@@ -35,5 +35,7 @@
     <color name="fbutton_color_concrete">#95a5a6</color>
     <color name="fbutton_color_asbestos">#7f8c8d</color>
     <color name="location_button">#fff</color>
-
+    <!--Cores do Mapa-->
+    <color name="rotaTracandoFundo">#90CAF9</color>
+    <color name="rotaTracandoSuperficie">#E3F2FD</color>
 </resources>

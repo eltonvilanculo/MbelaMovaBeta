@@ -4,6 +4,7 @@ import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -14,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +40,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
@@ -93,12 +96,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import mmconsultoria.co.mz.mbelamova.Common.Common;
 import mmconsultoria.co.mz.mbelamova.Common.Util;
 import mmconsultoria.co.mz.mbelamova.R;
+import mmconsultoria.co.mz.mbelamova.googleMaps.GetDirectionsData;
 import mmconsultoria.co.mz.mbelamova.model.BaseActivity;
 import mmconsultoria.co.mz.mbelamova.mpesaapi.Mpesa;
+import mmconsultoria.co.mz.mbelamova.util.AppUtils;
 import mz.co.moovi.mpesalib.api.PaymentResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
+
+import static java.lang.Double.parseDouble;
+import static java.lang.Double.valueOf;
 
 
 @RequiresApi(api = Build.VERSION_CODES.P)
@@ -115,6 +124,7 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
     //Constantes
     private static final float DEFAULT_ZOOM = 15f;
     private static final int RC_SIGN_IN = 9001;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static int PLACE_PICKER_REQUEST = 1;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 136));
@@ -172,6 +182,9 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
     private NavigationView navigationView;
     private Location currentLocation;
     private Mpesa mpesa;
+    private Object dataTranfer;
+
+    Double tripDistance;
 
     //private static final int[] COLORS = new int[]{R.color.primary_dark_material_light};
 //Inicializacao de variaves
@@ -180,7 +193,7 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onStart() {
         super.onStart();
-    if (acct != null) {
+        if (acct != null) {
 
             String personName = acct.getDisplayName();
             String personEmail = acct.getEmail();
@@ -204,7 +217,7 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-    mpesa = new Mpesa();
+        mpesa = new Mpesa();
         Toast.makeText(this, "Driver Mode", Toast.LENGTH_SHORT).show();
 
         //Elton Info
@@ -215,7 +228,8 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        signIn();
+
+        //  signIn();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
@@ -223,13 +237,12 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
         mPerfilFoto = headerView.findViewById(R.id.perfil_foto);
 
 
-
         navigation_menu = (ImageView) findViewById(R.id.navigation_menu);
 
         mGps = (ImageView) findViewById(R.id.ic_gps);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
-
+        acceptLocationPermission();
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -340,6 +353,11 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
                 if (destination == null) {
                     autocompleteFragment.setHint(getString(R.string.Destiny));
                 } else {
+                    mMap.clear();
+                    dataTranfer = new Object[3];
+                    //   dataTranfer[0]=mMap;
+//                    GetDirectionsData getDirectionsData=new GetDirectionsData();
+//                    getDirectionsData.execute(dataTranfer);
                     getDirection();
                 }
 
@@ -397,7 +415,6 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
             }
 
 
-
             //  Marker pickUpMarker= mMap.addMarker(new MarkerOptions().position(currentPosition).title("PickUpLocation"));
 
             // End marker
@@ -425,17 +442,19 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
 
         //final String phoneNumber = mpesaPhoneNr.getText().toString().trim();
         // final String amount = mpesaAmount.getText().toString().trim();
-        mpesa.pay(valorRegarga.getText().toString(), "258845204801")
+        final double value = parseDouble(valorRegarga.getText().toString()) * tripDistance;
+        Timber.d("O valor da transacao eh: " + value);
+        mpesa.pay(Double.toString(value), "258845204801")
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onSuccess, this::onError);
     }
 
     private void onError(Throwable throwable) {
-
+        Timber.d(throwable);
     }
 
     private void onSuccess(PaymentResponse paymentResponse) {
-
+        Timber.d("Successo" +"code: "+paymentResponse.getOutput_ResponseCode()+" TransactionID: "+paymentResponse.getOutput_TransactionID());
     }
 
     @Override
@@ -642,6 +661,22 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
                     try {
                         JSONObject jsonObject = new JSONObject(response.body().toString());
                         JSONArray jsonArray = jsonObject.getJSONArray("routes");
+                        //
+                        //JSONObject rout = jsonArray.getJSONObject(0);
+                        JSONArray legs = new JSONArray(jsonArray.getJSONObject(0).getString("legs"));
+                        JSONObject legs_info = legs.getJSONObject(0);
+                        JSONArray steps = legs_info.getJSONArray("steps");
+                        String duracao = legs_info.getJSONObject("duration").getString("text");
+                        String distancia = legs_info.getJSONObject("distance").getString("text");
+                        tripDistance = parseDouble(distancia.replace("km", "").replaceAll(" ", ""));
+
+                        Log.d(TAG, "duracao: " + duracao);
+                        Log.d(TAG, "distancia: " + distancia);
+
+//                        tripDistance = Double.parseDouble(legs_info.getJSONObject("distance").getString("text"));
+                        Toast.makeText(MapsActivity.this, "deslocamento Antes : " + (tripDistance), Toast.LENGTH_LONG).show();
+                        Toast.makeText(MapsActivity.this, "deslocamento Depois: " + (tripDistance + 2), Toast.LENGTH_LONG).show();
+
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject route = jsonArray.getJSONObject(i);
                             JSONObject poly = route.getJSONObject("overview_polyline");
@@ -658,8 +693,8 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
                             mMap.animateCamera(mCameraUpdate);
 
                             polylineOptions = new PolylineOptions();
-                            polylineOptions.color(Color.GRAY);
-                            polylineOptions.width(5);
+                            polylineOptions.color(R.color.rotaTracandoFundo);
+                            polylineOptions.width(8);
                             polylineOptions.startCap(new SquareCap());
                             polylineOptions.endCap(new SquareCap());
                             polylineOptions.jointType(JointType.ROUND);
@@ -667,8 +702,8 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
                             greyPolyline = mMap.addPolyline(polylineOptions);
 
                             blackPolylineOptions = new PolylineOptions();
-                            blackPolylineOptions.color(Color.BLUE);
-                            blackPolylineOptions.width(5);
+                            blackPolylineOptions.color(R.color.rotaTracandoSuperficie);
+                            blackPolylineOptions.width(8);
                             blackPolylineOptions.startCap(new SquareCap());
                             blackPolylineOptions.endCap(new SquareCap());
                             blackPolylineOptions.jointType(JointType.ROUND);
@@ -1024,5 +1059,58 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onConnectionSuspended(int i) {
 
+    }
+
+    public void acceptLocationPermission() {
+        if (checkPlayServices()) {
+            // If this check succeeds, proceed with normal processing.
+            // Otherwise, prompt user to get valid Play Services APK.
+            if (!AppUtils.isLocationEnabled(this)) {
+                // notify user
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setMessage(getString(R.string.location_dialog_msg));
+                dialog.setPositiveButton(getString(R.string.location_settings), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(myIntent);
+                    }
+                });
+                dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
+                dialog.show();
+            }
+            buildGoogleApiClient();
+        } else {
+            Toast.makeText(this, "Location not supported in this device", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                //finish();
+            }
+            return false;
+        }
+        return true;
     }
 }

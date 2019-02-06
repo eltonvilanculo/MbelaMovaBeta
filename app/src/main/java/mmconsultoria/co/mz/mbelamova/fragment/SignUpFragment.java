@@ -13,6 +13,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
@@ -38,6 +41,7 @@ import static android.app.Activity.RESULT_OK;
  * A simple {@link Fragment} subclass.
  */
 public class SignUpFragment extends BaseFragment {
+    private static final int RC_SIGN_IN = 9001;
     public final int requestCode = 100;
 
     @BindView(R.id.sign_up_is_driver_check)
@@ -53,6 +57,10 @@ public class SignUpFragment extends BaseFragment {
     private Uri imageUri;
     private String phoneNumber;
 
+    //Google account
+    GoogleSignInAccount acct;
+    GoogleSignInClient mGoogleSignInClient;
+
     public static SignUpFragment newInstance(String phoneNumber) {
 
 
@@ -67,11 +75,20 @@ public class SignUpFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        signIn();
+
         if (getArguments() != null) {
             phoneNumber = getArguments().getString(DatabaseValue.phone_number.name());
         }
 
 
+
+    }
+
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     public SignUpFragment() {

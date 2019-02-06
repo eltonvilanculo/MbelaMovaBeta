@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import mmconsultoria.co.mz.mbelamova.R;
 import mmconsultoria.co.mz.mbelamova.fragment.LoginFragment;
+import mmconsultoria.co.mz.mbelamova.fragment.SignUpFragment;
 import mmconsultoria.co.mz.mbelamova.model.BaseActivity;
 import mmconsultoria.co.mz.mbelamova.model.SimpleCallback;
 
@@ -23,19 +24,20 @@ public class LoginActivity extends BaseActivity {
     private SimpleCallback<String> phoneNumberCallback;
     private GoogleApiClient googleApiClient;
 
-
+    private SignUpFragment signUpFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         loginFragment = new LoginFragment();
+        signUpFragment =new SignUpFragment();
 
         requestPhoneNumber();
 
 
 
-        swapFragment(R.id.login_container,loginFragment);
+        swapFragment(R.id.login_container,signUpFragment);
     }
 
     @Override
