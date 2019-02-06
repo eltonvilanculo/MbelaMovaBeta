@@ -185,6 +185,9 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
     private Object dataTranfer;
 
     Double tripDistance;
+    private double value;
+    private double volume=0.16;
+    private double fuelPrice=69;
 
     //private static final int[] COLORS = new int[]{R.color.primary_dark_material_light};
 //Inicializacao de variaves
@@ -309,14 +312,20 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
                             View customView = getLayoutInflater().inflate(R.layout.recharge_dialog, null, false);
                             valorRegarga = customView.findViewById(R.id.valor_a_recarregar);
                             btnRecarregar = customView.findViewById(R.id.recarregar_button);
+
                             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MapsActivity.this);
                             //alertBuilder.setTitle("Recarga");
                             alertBuilder.setView(customView);
                             AlertDialog alertDialog = alertBuilder.create();
+                            valorRegarga.setText(String.format("%.3f",
+                                    valueToPay(volume,fuelPrice)
+                                    )
+                            );
                             alertDialog.show();
 
                             btnRecarregar.setOnClickListener(v -> {
                                 alertDialog.hide();
+
                                 payMpesa();
                                 alertDialog.dismiss();
                                 alertDialog.cancel();
@@ -442,9 +451,15 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
 
         //final String phoneNumber = mpesaPhoneNr.getText().toString().trim();
         // final String amount = mpesaAmount.getText().toString().trim();
-        final double value = parseDouble(valorRegarga.getText().toString()) * tripDistance;
+
         Timber.d("O valor da transacao eh: " + value);
-        mpesa.pay(Double.toString(value), "258845204801")
+
+
+
+
+        mpesa.pay(String.format("%.3f",
+                valueToPay(volume,fuelPrice)
+        ), "258845204801")
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onSuccess, this::onError);
     }
@@ -1112,5 +1127,11 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
             return false;
         }
         return true;
+    }
+    public double valueToPay(double volume , double fuelPrice){
+
+
+        return volume*fuelPrice*tripDistance+(volume*fuelPrice*tripDistance*0.15);
+
     }
 }
