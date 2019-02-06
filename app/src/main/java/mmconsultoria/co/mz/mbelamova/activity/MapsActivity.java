@@ -1129,8 +1129,6 @@ public class MapsActivity extends BaseActivity implements NavigationView.OnNavig
         return true;
     }
     public double valueToPay(double volume , double fuelPrice){
-
-
         return volume*fuelPrice*tripDistance+(volume*fuelPrice*tripDistance*0.15);
 
     }
